@@ -1,0 +1,64 @@
+import { FastifyPluginAsync } from 'fastify';
+
+export const getUsersRoute: FastifyPluginAsync = async (app) => {
+  app.get(
+    '/users',
+    {
+      schema: {
+        description: 'Get a list of users',
+        tags: ['Users'],
+        summary: 'Get all users',
+        querystring: {
+          type: 'object',
+          properties: {
+            page: {
+              type: 'integer',
+              description: 'Page number for pagination',
+              minimum: 1,
+              default: 1,
+            },
+          },
+        },
+        response: {
+          200: {
+            description: 'Successful response with a list of users',
+            type: 'object',
+            properties: {
+              data: {
+                type: 'array',
+                items: {
+                  type: 'object',
+                  required: ['id', 'name', 'email'],
+                  properties: {
+                    id: { type: 'string', format: 'uuid' },
+                    name: { type: ['string', 'null'], maxLength: 100 },
+                    email: { type: 'string', format: 'email' },
+                  },
+                },
+                examples: [
+                  [
+                    { id: 1, name: 'John Doe', email: 'john.doe@email.com' },
+                    {
+                      id: 2,
+                      name: 'Jane Smith',
+                      email: 'jane.smith@email.com',
+                    },
+                  ],
+                  [],
+                ],
+              },
+            },
+          },
+        },
+      },
+    },
+    async (req, res) => {
+      return {
+        data: [
+          { id: 1, name: 'John Doe', email: 'john.doe@email.com' },
+          { id: 2, name: 'Jane Smith', email: 'jane.smith@email.com' },
+        ],
+      };
+    }
+  );
+};
